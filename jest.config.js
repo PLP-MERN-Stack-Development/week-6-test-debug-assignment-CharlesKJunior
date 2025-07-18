@@ -1,57 +1,65 @@
-// jest.config.js - Root Jest configuration file
-
+// Root Jest configuration for MERN stack (Week 6 Assignment)
 module.exports = {
-  // Base configuration for all tests
   projects: [
-    // Server-side tests configuration
+    // Server-side tests (Unit + Integration)
     {
       displayName: 'server',
       testEnvironment: 'node',
-      testMatch: ['<rootDir>/server/tests/**/*.test.js'],
-      moduleFileExtensions: ['js', 'json', 'node'],
+      testMatch: [
+        '<rootDir>/server/tests/unit/**/*.test.js',
+        '<rootDir>/server/tests/integration/**/*.test.js'
+      ],
       setupFilesAfterEnv: ['<rootDir>/server/tests/setup.js'],
+      moduleFileExtensions: ['js', 'json'],
       coverageDirectory: '<rootDir>/coverage/server',
       collectCoverageFrom: [
         'server/src/**/*.js',
-        '!server/src/config/**',
-        '!**/node_modules/**',
+        '!server/src/config/**', // Exclude config files
+        '!server/src/index.js',  // Exclude app entry point
       ],
+      globalSetup: '<rootDir>/server/tests/mongo.setup.js', // Test DB
     },
-    
-    // Client-side tests configuration
+
+    // Client-side tests (Unit + Integration)
     {
       displayName: 'client',
       testEnvironment: 'jsdom',
-      testMatch: ['<rootDir>/client/src/**/*.test.{js,jsx}'],
-      moduleFileExtensions: ['js', 'jsx', 'json'],
+      testMatch: [
+        '<rootDir>/client/src/tests/unit/**/*.test.{js,jsx}',
+        '<rootDir>/client/src/tests/integration/**/*.test.{js,jsx}'
+      ],
       moduleNameMapper: {
-        '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
-        '\\.(jpg|jpeg|png|gif|webp|svg)$': '<rootDir>/client/src/tests/__mocks__/fileMock.js',
+        '\\.(css|less|scss)$': 'identity-obj-proxy',
+        '\\.(jpg|svg)': '<rootDir>/client/src/tests/__mocks__/fileMock.js',
+        '^@/(.*)$': '<rootDir>/client/src/$1', // Alias support
       },
-      setupFilesAfterEnv: ['<rootDir>/client/src/tests/setup.js'],
+      setupFilesAfterEnv: [
+        '@testing-library/jest-dom/extend-expect',
+        '<rootDir>/client/src/tests/setup.js'
+      ],
       transform: {
         '^.+\\.(js|jsx)$': 'babel-jest',
       },
       coverageDirectory: '<rootDir>/coverage/client',
       collectCoverageFrom: [
         'client/src/**/*.{js,jsx}',
-        '!client/src/index.js',
-        '!**/node_modules/**',
+        '!client/src/main.jsx',     // Exclude entry point
+        '!client/src/**/*.stories.js', // Exclude Storybook
       ],
     },
   ],
-  
-  // Global configuration
+
+  // Global configurations (applies to all projects)
   verbose: true,
   collectCoverage: true,
-  coverageReporters: ['text', 'lcov', 'clover', 'html'],
+  coverageReporters: ['text', 'lcov', 'html'],
   coverageThreshold: {
     global: {
-      statements: 70,
+      statements: 70,  // Matches assignment requirement
       branches: 60,
       functions: 70,
       lines: 70,
     },
   },
   testTimeout: 10000,
-}; 
+};
